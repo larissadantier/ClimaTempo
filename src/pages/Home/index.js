@@ -88,7 +88,6 @@ const mylist = [
       "condition": "cloudly_day"
     }
   ];
-
 export default function Home(){
     return(
         <SafeAreaView style={styles.container}>
