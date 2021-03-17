@@ -30,7 +30,6 @@ export default function Home(){
 
       let location = await Location.getCurrentPositionAsync({});
       
-      //weather?key=71abd0c6&lat=-21.7526009&lon=-41.3438487
        const response = await api.get(`/weather?key=${key}&lat=${location.coords.latitude}&lon=${location.coords.longitude}`);
 
        setWeather(response.data);

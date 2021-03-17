@@ -5,6 +5,8 @@ import { Feather } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 
 import api, {key} from '../../services/api';
+import {LinearGradient} from 'expo-linear-gradient';
+import Conditions from '../../components/Conditions'
 
 export default function Search(){
     const navigation = useNavigation();
@@ -27,6 +29,55 @@ export default function Search(){
         setInput('');
         Keyboard.dismiss();
     }
+
+    if(city){
+        return(
+            <SafeAreaView style={styles.container}>
+            <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate('Home')}>
+                <Feather
+                name="chevron-left"
+                size={32}
+                color="#000"
+                />
+                <Text style={{fontSize: 22}}>Voltar</Text>
+            </TouchableOpacity>
+
+            <View style={styles.searchBox}>
+                <TextInput
+                value={input}
+                onChangeText={(valor) => setInput(valor)}
+                placeholder="Ex: Campos Dos Goytacazes, RJ"
+                style={styles.input}
+                />
+                <TouchableOpacity style = {styles.icon} onPress={handleSeach}>
+                    <Feather
+                    name='search'
+                    size={22}
+                    color='#FFF'
+                    />
+                </TouchableOpacity>
+            </View>
+
+            <LinearGradient
+            style={styles.header}
+            colors={['#1ed6ff', '#97c1ff']}
+            >
+
+             <Text style={styles.date}>{city.results.date}</Text>
+             <Text style={styles.city}>{city.results.city_name}</Text>
+
+             <View>
+                 <Text style={styles.temp}>{city.results.temp}°</Text>
+             </View>
+
+             <Conditions weather={city}/>
+            </LinearGradient>
+
+         </SafeAreaView>
+
+        )
+    }
+
 
     return(
         <SafeAreaView style={styles.container}>
@@ -100,5 +151,28 @@ const styles = StyleSheet.create({
         justifyContent:'center',
         borderTopRightRadius:8,
         borderBottomRightRadius:8
+    },
+    header:{
+        marginTop:'5%',
+        width:'90%',
+        paddingTop: '3%',
+        paddingBottom: '3%',
+        alignItems:'center',
+        justifyContent:'space-between',
+        borderRadius: 8
+    },
+    date:{
+        color:'#FFF',
+        fontSize: 16
+    },
+    city:{
+        fontSize:20,
+        fontWeight:'bold',
+        color:'#FFF',
+    },
+    temp:{
+        color:'#FFF',
+        fontSize: 90,
+        fontWeight:'bold'
     }
 })
