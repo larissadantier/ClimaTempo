@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import { SafeAreaView, Text, StyleSheet, FlatList } from 'react-native';
+import { SafeAreaView, Text, StyleSheet, FlatList, View } from 'react-native';
 import * as Location from 'expo-location';
 
 import Menu from '../../components/Menu';
@@ -9,88 +9,6 @@ import Forcast from '../../components/Forcast'
 import api, { key } from '../../services/api'
 
 
-const mylist = [
-    {
-      "date": "13/03",
-      "weekday": "Sáb",
-      "max": 30,
-      "min": 22,
-      "description": "Tempestades",
-      "condition": "storm"
-    },
-    {
-      "date": "14/03",
-      "weekday": "Dom",
-      "max": 31,
-      "min": 21,
-      "description": "Tempestades isoladas",
-      "condition": "storm"
-    },
-    {
-      "date": "15/03",
-      "weekday": "Seg",
-      "max": 31,
-      "min": 22,
-      "description": "Parcialmente nublado",
-      "condition": "cloudly_day"
-    },
-    {
-      "date": "16/03",
-      "weekday": "Ter",
-      "max": 31,
-      "min": 22,
-      "description": "Parcialmente nublado",
-      "condition": "cloudly_day"
-    },
-    {
-      "date": "17/03",
-      "weekday": "Qua",
-      "max": 31,
-      "min": 21,
-      "description": "Ensolarado",
-      "condition": "clear_day"
-    },
-    {
-      "date": "18/03",
-      "weekday": "Qui",
-      "max": 31,
-      "min": 21,
-      "description": "Tempestades",
-      "condition": "storm"
-    },
-    {
-      "date": "19/03",
-      "weekday": "Sex",
-      "max": 30,
-      "min": 22,
-      "description": "Tempestades",
-      "condition": "storm"
-    },
-    {
-      "date": "20/03",
-      "weekday": "Sáb",
-      "max": 30,
-      "min": 23,
-      "description": "Ensolarado com muitas nuvens",
-      "condition": "cloudly_day"
-    },
-    {
-      "date": "21/03",
-      "weekday": "Dom",
-      "max": 31,
-      "min": 22,
-      "description": "Ensolarado com muitas nuvens",
-      "condition": "cloudly_day"
-    },
-    {
-      "date": "22/03",
-      "weekday": "Seg",
-      "max": 31,
-      "min": 22,
-      "description": "Ensolarado com muitas nuvens",
-      "condition": "cloudly_day"
-    }
-  ];
 export default function Home(){
   const[errorMsg, setErrorMsg] = useState(null);
   const[loading, setLoading] = useState(true);
@@ -113,15 +31,15 @@ export default function Home(){
       let location = await Location.getCurrentPositionAsync({});
       
       //weather?key=71abd0c6&lat=-21.7526009&lon=-41.3438487
-       const responde = await api.get(`/weather?key=${key}&lat=${location.coords.latitude}&lon=${location.coords.longitude}`);
+       const response = await api.get(`/weather?key=${key}&lat=${location.coords.latitude}&lon=${location.coords.longitude}`);
 
-       setWeather(responde.data);
+       setWeather(response.data);
 
-       if(responde.data.results.currently === 'noite') {
+       if(response.data.results.currently === 'noite') {
           setBackground(['#0c3741', '#0f2f61']);
        }
 
-       switch(responde.data.results.condition_slug){
+       switch(response.data.results.condition_slug){
          case 'clear_day':
            setIcon({name: 'partly-sunny', color:'#FFB300'});
            break;
@@ -133,24 +51,32 @@ export default function Home(){
            break;
        }
 
-       setLoading(false)
+       setLoading(false);
       })();
+
     }, []);
 
+      if(loading){
+        return(
+          <View style={styles.container}>
+              <Text style={{fontSize: 17, fontStyle:'italic'}}>Carregando Dados...</Text>
+          </View>
+        )
+      }
 
     return(
         <SafeAreaView style={styles.container}>
             <Menu/>
             
-            <Header/>
+            <Header background={background} weather={weather} icon={icon}/>
 
-            <Conditions/>
+            <Conditions weather={weather}/>
 
             <FlatList
             horizontal={true} 
             contentContainerStyle={{paddingBottom: '5%'}}
             style={styles.list}
-            data={mylist} 
+            data={weather.results.forecast} 
             keyExtractor={item => item.date}
             renderItem = { ({ item }) => <Forcast data={item}/> }
             />
